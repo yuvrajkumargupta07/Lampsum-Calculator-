@@ -1,220 +1,315 @@
 <!doctype html>
-
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Lumpsum Mutual Fund Calculator</title>
+  <title>Master Mutual Fund Calculator — Lumpsum & SIP</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
   <style>
-    :root{--bg:#0f172a;--card:#0b1220;--accent:#ef4444;--muted:#9aa4b2;--glass:rgba(255,255,255,0.03)}
+    :root{
+      --bg:#0b1220; --card:#071028; --muted:#90a0b1; --accent:#ef6b57; --glass:rgba(255,255,255,0.03);
+      --card-radius:14px;
+    }
     *{box-sizing:border-box}
-    body{font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial; margin:0; background:linear-gradient(180deg,#071029 0%, #071a2a 100%); color:#e6eef6; padding:28px}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial;
+      background:linear-gradient(180deg,#051025 0%, #071a2a 100%);
+      color:#e6eef6; padding:20px;
+      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;
+    }
     .wrap{max-width:980px;margin:0 auto}
     header{display:flex;gap:12px;align-items:center;margin-bottom:18px}
     header h1{font-size:20px;margin:0}
-    .card{background:var(--card);padding:18px;border-radius:14px;box-shadow:0 6px 30px rgba(2,6,23,0.6);}
-    .grid{display:grid;grid-template-columns:repeat(12,1fr);gap:12px;margin-top:12px}
-    label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
-    input[type="number"], input[type="text"]{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:var(--glass);color:inherit}
-    select{padding:10px;border-radius:8px;background:var(--glass);border:1px solid rgba(255,255,255,0.06);color:inherit}
+    .card{background:var(--card);padding:16px;border-radius:var(--card-radius);box-shadow:0 8px 30px rgba(2,6,23,0.6)}
+    .tabs{display:flex;gap:8px;margin-bottom:12px}
+    .tab{padding:8px 12px;border-radius:10px;background:transparent;border:1px solid rgba(255,255,255,0.03);cursor:pointer}
+    .tab.active{background:linear-gradient(90deg,var(--accent),#f97316);color:white;border:0}
+    .row{display:grid;grid-template-columns:repeat(12,1fr);gap:10px}
     .col-4{grid-column:span 4}
     .col-6{grid-column:span 6}
     .col-12{grid-column:span 12}
-    .actions{display:flex;gap:10px;align-items:center}
+    label{display:block;color:var(--muted);font-size:13px;margin-bottom:6px}
+    input[type="number"], input[type="text"], select{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:var(--glass);color:inherit}
     button{padding:10px 14px;border-radius:10px;border:0;cursor:pointer;background:var(--accent);color:white}
     button.secondary{background:transparent;border:1px solid rgba(255,255,255,0.06)}
-    .result{margin-top:16px;display:flex;gap:12px;flex-wrap:wrap}
+    .stats{display:flex;gap:12px;flex-wrap:wrap;margin-top:12px}
     .stat{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:12px;border-radius:10px;min-width:180px}
-    .stat h3{margin:0;font-size:14px;color:var(--muted)}
+    .stat h3{margin:0;font-size:13px;color:var(--muted)}
     .stat p{margin:6px 0 0;font-weight:700;font-size:18px}
-    table{width:100%;border-collapse:collapse;margin-top:12px}
+    table{width:100%;border-collapse:collapse;margin-top:10px}
     th,td{padding:8px;border-bottom:1px solid rgba(255,255,255,0.03);text-align:right}
-    th{text-align:left;color:var(--muted);font-weight:600}
+    th{color:var(--muted);text-align:left}
     .center{text-align:center}
-    footer{margin-top:16px;color:var(--muted);font-size:13px}
-    @media(max-width:700px){.col-4,.col-6{grid-column:span 12}}
+    footer{margin-top:12px;color:var(--muted);font-size:13px}
+    @media (max-width:800px){.col-4,.col-6{grid-column:span 12}}
   </style>
 </head>
 <body>
   <div class="wrap">
     <header>
-      <div style="width:52px;height:52px;background:linear-gradient(135deg,#ef4444,#f97316);border-radius:12px;display:flex;align-items:center;justify-content:center;font-weight:700">LM</div>
+      <div style="width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,#ef6b57,#f97316);display:flex;align-items:center;justify-content:center;font-weight:800">MF</div>
       <div>
-        <h1>Lumpsum Mutual Fund Calculator</h1>
-        <div style="color:var(--muted);font-size:13px">Simple calculator to find future value of a one-time investment</div>
+        <h1>Master Mutual Fund Calculator</h1>
+        <div style="color:var(--muted);font-size:13px">Lumpsum + SIP — projections, charts & CSV download</div>
       </div>
-    </header><div class="card">
-  <div style="font-weight:700">Input</div>
-  <div class="grid">
-    <div class="col-4">
-      <label>Investment Amount (₹)</label>
-      <input id="amount" type="number" min="0" step="any" placeholder="e.g. 100000" />
-    </div>
+    </header>
 
-    <div class="col-4">
-      <label>Expected Annual Return (%)</label>
-      <input id="rate" type="number" min="0" step="any" placeholder="e.g. 12" />
-    </div>
-
-    <div class="col-4">
-      <label>Investment Period (years)</label>
-      <input id="years" type="number" min="1" step="1" placeholder="e.g. 5" />
-    </div>
-
-    <div class="col-6">
-      <label>Compounding Frequency</label>
-      <select id="freq">
-        <option value="1">Annually</option>
-        <option value="4">Quarterly</option>
-        <option value="12">Monthly</option>
-        <option value="365">Daily</option>
-      </select>
-    </div>
-
-    <div class="col-6 actions">
-      <button id="calc">Calculate</button>
-      <button id="reset" class="secondary">Reset</button>
-      <button id="download" class="secondary">Download CSV</button>
-    </div>
-
-    <div class="col-12 result">
-      <div class="stat">
-        <h3>Future Value</h3>
-        <p id="fv">-</p>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <div style="font-weight:700">Select Calculator</div>
+        <div style="display:flex;gap:8px">
+          <button id="tabL" class="tab active" onclick="switchTab('lumpsum')">Lumpsum</button>
+          <button id="tabS" class="tab" onclick="switchTab('sip')">SIP</button>
+        </div>
       </div>
-      <div class="stat">
-        <h3>Total Gain</h3>
-        <p id="gain">-</p>
-      </div>
-      <div class="stat">
-        <h3>Annualised Return (CAGR)</h3>
-        <p id="cagr">-</p>
-      </div>
-    </div>
 
-    <div class="col-12" style="margin-top:10px">
-      <canvas id="chart" height="120"></canvas>
-    </div>
+      <!-- LUMPSUM SECTION -->
+      <div id="lumpsum" style="margin-top:14px">
+        <div style="font-weight:700;margin-bottom:8px">Lumpsum Calculator</div>
+        <div class="row">
+          <div class="col-4">
+            <label>Investment Amount (₹)</label>
+            <input id="ls_amount" type="number" min="0" step="any" placeholder="e.g. 100000">
+          </div>
+          <div class="col-4">
+            <label>Expected Annual Return (%)</label>
+            <input id="ls_rate" type="number" min="0" step="any" placeholder="e.g. 12">
+          </div>
+          <div class="col-4">
+            <label>Duration (Years)</label>
+            <input id="ls_years" type="number" min="1" step="1" placeholder="e.g. 5">
+          </div>
 
-    <div class="col-12">
-      <div style="font-weight:700;margin-top:10px">Year-wise projection</div>
-      <div style="overflow:auto;max-height:280px">
-        <table id="table">
-          <thead>
-            <tr><th class="center">Year</th><th>Start Value</th><th>Interest Earned</th><th>End Value</th></tr>
-          </thead>
-          <tbody></tbody>
-        </table>
+          <div class="col-6" style="margin-top:6px">
+            <label>Compounding Frequency</label>
+            <select id="ls_freq">
+              <option value="1">Annually</option>
+              <option value="4">Quarterly</option>
+              <option value="12">Monthly</option>
+              <option value="365">Daily</option>
+            </select>
+          </div>
+
+          <div class="col-6" style="display:flex;gap:8px;align-items:end;justify-content:flex-end">
+            <button id="ls_calc">Calculate</button>
+            <button id="ls_reset" class="secondary">Reset</button>
+            <button id="ls_csv" class="secondary">Download CSV</button>
+          </div>
+
+          <div class="col-12 stats">
+            <div class="stat">
+              <h3>Future Value</h3>
+              <p id="ls_fv">-</p>
+            </div>
+            <div class="stat">
+              <h3>Total Gain</h3>
+              <p id="ls_gain">-</p>
+            </div>
+            <div class="stat">
+              <h3>CAGR</h3>
+              <p id="ls_cagr">-</p>
+            </div>
+          </div>
+
+          <div class="col-12" style="margin-top:10px">
+            <canvas id="ls_chart" height="120"></canvas>
+          </div>
+
+          <div class="col-12" style="margin-top:10px">
+            <div style="font-weight:700">Year-wise Projection</div>
+            <div style="overflow:auto;max-height:260px">
+              <table id="ls_table"><thead><tr><th class="center">Year</th><th>Start Value</th><th>Interest</th><th>End Value</th></tr></thead><tbody></tbody></table>
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
 
+      <!-- SIP SECTION -->
+      <div id="sip" style="display:none;margin-top:14px">
+        <div style="font-weight:700;margin-bottom:8px">SIP Calculator</div>
+        <div class="row">
+          <div class="col-4">
+            <label>Monthly SIP Amount (₹)</label>
+            <input id="sip_amount" type="number" min="0" step="any" placeholder="e.g. 5000">
+          </div>
+          <div class="col-4">
+            <label>Expected Annual Return (%)</label>
+            <input id="sip_rate" type="number" min="0" step="any" placeholder="e.g. 12">
+          </div>
+          <div class="col-4">
+            <label>Duration (Years)</label>
+            <input id="sip_years" type="number" min="1" step="1" placeholder="e.g. 10">
+          </div>
+
+          <div class="col-12" style="display:flex;gap:8px;justify-content:flex-end;align-items:end">
+            <button id="sip_calc">Calculate</button>
+            <button id="sip_reset" class="secondary">Reset</button>
+            <button id="sip_csv" class="secondary">Download CSV</button>
+          </div>
+
+          <div class="col-12 stats">
+            <div class="stat">
+              <h3>Maturity Amount</h3>
+              <p id="sip_fv">-</p>
+            </div>
+            <div class="stat">
+              <h3>Total Invested</h3>
+              <p id="sip_inv">-</p>
+            </div>
+            <div class="stat">
+              <h3>Absolute Gain</h3>
+              <p id="sip_gain">-</p>
+            </div>
+          </div>
+
+          <div class="col-12" style="margin-top:10px">
+            <canvas id="sip_chart" height="120"></canvas>
+          </div>
+
+          <div class="col-12" style="margin-top:10px">
+            <div style="font-weight:700">Year-wise Projection</div>
+            <div style="overflow:auto;max-height:260px">
+              <table id="sip_table"><thead><tr><th class="center">Year</th><th>Start Value</th><th>Invested This Year</th><th>Interest</th><th>End Value</th></tr></thead><tbody></tbody></table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <footer>
+        Tip: Values are indicative and for educational purpose. For SIP we assume monthly contributions at month-start (annuity due).
+      </footer>
+    </div>
   </div>
 
-  <footer>
-    Tip: For lumpsum, formula used = PV × (1 + r/n)^(n×t). Values are indicative and for education only.
-  </footer>
-</div>
-
-  </div>  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>  <script>
-    const fmt = (v)=>{
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script>
+    // Helpers
+    const INR = (v, opts={}) => {
       if(isNaN(v) || !isFinite(v)) return '-';
-      return v.toLocaleString('en-IN', {style:'currency', currency:'INR', maximumFractionDigits:0});
+      const digits = opts.digits ?? 0;
+      return v.toLocaleString('en-IN', {style:'currency',currency:'INR',maximumFractionDigits:digits});
+    };
+
+    const el = id => document.getElementById(id);
+
+    // Tab switch
+    function switchTab(tab){
+      document.getElementById('lumpsum').style.display = tab==='lumpsum' ? 'block' : 'none';
+      document.getElementById('sip').style.display = tab==='sip' ? 'block' : 'none';
+      document.getElementById('tabL').classList.toggle('active', tab==='lumpsum');
+      document.getElementById('tabS').classList.toggle('active', tab==='sip');
     }
 
-    const amountEl = document.getElementById('amount');
-    const rateEl = document.getElementById('rate');
-    const yearsEl = document.getElementById('years');
-    const freqEl = document.getElementById('freq');
-    const fvEl = document.getElementById('fv');
-    const gainEl = document.getElementById('gain');
-    const cagrEl = document.getElementById('cagr');
-    const tableBody = document.querySelector('#table tbody');
-    const calcBtn = document.getElementById('calc');
-    const resetBtn = document.getElementById('reset');
-    const downloadBtn = document.getElementById('download');
-    const ctx = document.getElementById('chart').getContext('2d');
-    let chart = null;
-    
-    function compute(){
-      const pv = parseFloat(amountEl.value);
-      const annual = parseFloat(rateEl.value);
-      const years = parseInt(yearsEl.value);
-      const freq = parseInt(freqEl.value);
-      if(isNaN(pv) || pv<=0 || isNaN(annual) || isNaN(years) || years<=0){
-        alert('Please enter valid values'); return;
-      }
-      const r = annual/100;
-      const n = freq;
+    // LUMPSUM Logic
+    let lsChart = null, sipChart = null;
+    function calcLumpsum(){
+      const pv = parseFloat(el('ls_amount').value);
+      const annual = parseFloat(el('ls_rate').value);
+      const years = parseInt(el('ls_years').value);
+      const freq = parseInt(el('ls_freq').value);
+      if (isNaN(pv) || pv<=0 || isNaN(annual) || isNaN(years) || years<=0){ alert('Please enter valid Lumpsum inputs'); return; }
+      const r = annual/100; const n = freq;
       const totalPeriods = n * years;
-      // Effective rate per period
       const ratePerPeriod = r / n;
-      // Future value using compound interest
       const fv = pv * Math.pow(1 + ratePerPeriod, totalPeriods);
       const gain = fv - pv;
-      // CAGR = (FV/PV)^(1/years) -1
       const cagr = Math.pow(fv / pv, 1/years) - 1;
 
-      fvEl.textContent = fmt(Math.round(fv));
-      gainEl.textContent = fmt(Math.round(gain));
-      cagrEl.textContent = (cagr*100).toFixed(2) + ' %';
+      el('ls_fv').textContent = INR(Math.round(fv));
+      el('ls_gain').textContent = INR(Math.round(gain));
+      el('ls_cagr').textContent = (cagr*100).toFixed(2) + ' %';
 
-      // Year-wise breakdown (compute values at the end of each year)
-      tableBody.innerHTML = '';
-      const yearsArr = [];
-      const endValues = [];
-
+      // Year-wise rows and chart
+      const tbody = document.querySelector('#ls_table tbody'); tbody.innerHTML = '';
+      const labels = [], data = [];
       for(let y=1;y<=years;y++){
-        const periods = n * y;
-        const end = pv * Math.pow(1 + ratePerPeriod, periods);
-        const start = (y===1)? pv : pv * Math.pow(1 + ratePerPeriod, n*(y-1));
+        const end = pv * Math.pow(1 + ratePerPeriod, n*y);
+        const start = pv * Math.pow(1 + ratePerPeriod, n*(y-1));
         const interest = end - start;
         const tr = document.createElement('tr');
-        tr.innerHTML = `<td class="center">${y}</td><td style="text-align:right">${fmt(Math.round(start))}</td><td style="text-align:right">${fmt(Math.round(interest))}</td><td style="text-align:right">${fmt(Math.round(end))}</td>`;
-        tableBody.appendChild(tr);
-        yearsArr.push('Year ' + y);
-        endValues.push(Math.round(end));
+        tr.innerHTML = `<td class="center">${y}</td>
+                        <td style="text-align:right">${INR(Math.round(start))}</td>
+                        <td style="text-align:right">${INR(Math.round(interest))}</td>
+                        <td style="text-align:right">${INR(Math.round(end))}</td>`;
+        tbody.appendChild(tr);
+        labels.push('Year '+y); data.push(Math.round(end));
       }
 
-      // draw chart
-      if(chart) chart.destroy();
-      chart = new Chart(ctx, {
+      if(lsChart) lsChart.destroy();
+      const ctx = document.getElementById('ls_chart').getContext('2d');
+      lsChart = new Chart(ctx, {
         type: 'line',
-        data: {
-          labels: yearsArr,
-          datasets: [{
-            label: 'End Value (₹)',
-            data: endValues,
-            tension: 0.35,
-            fill: true,
-            backgroundColor: 'rgba(239,68,68,0.12)',
-            borderColor: 'rgba(239,68,68,0.95)',
-            pointRadius:4
-          }]
-        },
-        options: {
-          responsive:true,
-          plugins:{legend:{display:false}},
-          scales:{y:{beginAtZero:false,ticks:{callback:function(val){return val.toLocaleString('en-IN');}}}}
-        }
-      });
+        data: { labels, datasets: [{ label:'End Value', data, tension:0.35, fill:true, backgroundColor:'rgba(239,107,87,0.12)', borderColor:'rgba(239,107,87,0.95)', pointRadius:3 }]},
+        options:{plugins:{legend:{display:false}},scales:{y:{ticks:{callback: val => val.toLocaleString('en-IN')}}}}
+      );
 
-      // store last result for download
-      lastResult = {pv, annual, years, freq, rows: tableBody.innerHTML, fv: Math.round(fv)};
+      // Save last result for CSV
+      lastLS = {labels,data};
     }
 
-    let lastResult = null;
+    // SIP Logic (monthly, annuity-due: contribution at start of period)
+    function calcSIP(){
+      const p = parseFloat(el('sip_amount').value);
+      const annual = parseFloat(el('sip_rate').value);
+      const years = parseInt(el('sip_years').value);
+      if(isNaN(p) || p<=0 || isNaN(annual) || isNaN(years) || years<=0){ alert('Please enter valid SIP inputs'); return; }
+      const rMonthly = annual/100/12;
+      const months = years*12;
 
-    calcBtn.addEventListener('click', compute);
-    resetBtn.addEventListener('click', ()=>{
-      amountEl.value=''; rateEl.value=''; yearsEl.value=''; freqEl.value='1'; fvEl.textContent='-'; gainEl.textContent='-'; cagrEl.textContent='-'; tableBody.innerHTML=''; if(chart) chart.destroy(); lastResult=null;
-    });
+      // Maturity formula (annuity due): A = P * [ ( (1+r)^n -1 ) / r ] * (1+r)
+      const fv = p * ( (Math.pow(1 + rMonthly, months) - 1) / rMonthly ) * (1 + rMonthly);
+      const invested = p * months;
+      const gain = fv - invested;
 
-    downloadBtn.addEventListener('click', ()=>{
-      if(!lastResult){ alert('Please calculate first'); return; }
-      // build CSV
-      let csv = 'Year,Start Value,Interest Earned,End Value\n';
-      // parse rows from table
-      const rows = document.querySelectorAll('#table tbody tr');
+      el('sip_fv').textContent = INR(Math.round(fv));
+      el('sip_inv').textContent = INR(Math.round(invested));
+      el('sip_gain').textContent = INR(Math.round(gain));
+
+      // year-wise projection: simulate month by month to aggregate per year
+      const tbody = document.querySelector('#sip_table tbody'); tbody.innerHTML = '';
+      let balance = 0;
+      const labels = [], data = [], investedYearWise = [];
+      for(let y=1;y<=years;y++){
+        const start = balance;
+        let investedThisYear = 0;
+        let interestThisYear = 0;
+        for(let m=1;m<=12;m++){
+          // contribution at start of month
+          balance += p; investedThisYear += p;
+          const interest = balance * rMonthly; // interest on current balance
+          balance += interest; interestThisYear += interest;
+        }
+        const end = balance;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `<td class="center">${y}</td>
+                        <td style="text-align:right">${INR(Math.round(start))}</td>
+                        <td style="text-align:right">${INR(Math.round(investedThisYear))}</td>
+                        <td style="text-align:right">${INR(Math.round(interestThisYear))}</td>
+                        <td style="text-align:right">${INR(Math.round(end))}</td>`;
+        tbody.appendChild(tr);
+        labels.push('Year '+y); data.push(Math.round(end)); investedYearWise.push(Math.round(investedThisYear));
+      }
+
+      if(sipChart) sipChart.destroy();
+      const ctx = document.getElementById('sip_chart').getContext('2d');
+      sipChart = new Chart(ctx, {
+        type:'line',
+        data:{ labels, datasets:[{ label:'End Value', data, tension:0.35, fill:true, backgroundColor:'rgba(34,197,94,0.12)', borderColor:'rgba(34,197,94,0.95)', pointRadius:3 }]},
+        options:{plugins:{legend:{display:false}},scales:{y:{ticks:{callback: val => val.toLocaleString('en-IN')}}}}
+      });
+
+      lastSIP = {labels,data,investedYearWise};
+    }
+
+    // CSV Download functions
+    let lastLS = null, lastSIP = null;
+    function downloadLS(){
+      if(!lastLS){ alert('Please calculate Lumpsum first'); return; }
+      let csv = 'Year,Start Value,Interest,End Value\n';
+      const rows = document.querySelectorAll('#ls_table tbody tr');
       rows.forEach(r=>{
         const cols = r.querySelectorAll('td');
         const year = cols[0].textContent.trim();
@@ -223,16 +318,52 @@
         const end = cols[3].textContent.trim().replace(/₹|,/g,'');
         csv += `${year},${start},${interest},${end}\n`;
       });
-      const blob = new Blob([csv], {type: 'text/csv'});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url; a.download = 'lumpsum-projection.csv';
-      document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-    });
+      const blob = new Blob([csv], {type:'text/csv'}); const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'lumpsum_projection.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    }
 
-    // small convenience: prefill example values
-    amountEl.value = 100000;
-    rateEl.value = 12;
-    yearsEl.value = 5;
-  </script></body>
+    function downloadSIP(){
+      if(!lastSIP){ alert('Please calculate SIP first'); return; }
+      let csv = 'Year,Start Value,Invested,Interest,End Value\n';
+      const rows = document.querySelectorAll('#sip_table tbody tr');
+      rows.forEach(r=>{
+        const cols = r.querySelectorAll('td');
+        const year = cols[0].textContent.trim();
+        const start = cols[1].textContent.trim().replace(/₹|,/g,'');
+        const invested = cols[2].textContent.trim().replace(/₹|,/g,'');
+        const interest = cols[3].textContent.trim().replace(/₹|,/g,'');
+        const end = cols[4].textContent.trim().replace(/₹|,/g,'');
+        csv += `${year},${start},${invested},${interest},${end}\n`;
+      });
+      const blob = new Blob([csv], {type:'text/csv'}); const url = URL.createObjectURL(blob);
+      const a = document.createElement('a'); a.href = url; a.download = 'sip_projection.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+    }
+
+    // Reset handlers
+    function resetLumpsum(){
+      el('ls_amount').value=''; el('ls_rate').value=''; el('ls_years').value=''; el('ls_freq').value='1';
+      el('ls_fv').textContent='-'; el('ls_gain').textContent='-'; el('ls_cagr').textContent='-'; document.querySelector('#ls_table tbody').innerHTML=''; if(lsChart) lsChart.destroy(); lastLS=null;
+    }
+    function resetSIP(){
+      el('sip_amount').value=''; el('sip_rate').value=''; el('sip_years').value='';
+      el('sip_fv').textContent='-'; el('sip_inv').textContent='-'; el('sip_gain').textContent='-'; document.querySelector('#sip_table tbody').innerHTML=''; if(sipChart) sipChart.destroy(); lastSIP=null;
+    }
+
+    // Attach events
+    document.getElementById('ls_calc').addEventListener('click', calcLumpsum);
+    document.getElementById('ls_reset').addEventListener('click', resetLumpsum);
+    document.getElementById('ls_csv').addEventListener('click', downloadLS);
+
+    document.getElementById('sip_calc').addEventListener('click', calcSIP);
+    document.getElementById('sip_reset').addEventListener('click', resetSIP);
+    document.getElementById('sip_csv').addEventListener('click', downloadSIP);
+
+    // Prefill example values for convenience
+    el('ls_amount').value = 100000; el('ls_rate').value = 12; el('ls_years').value = 5; el('ls_freq').value = 12;
+    el('sip_amount').value = 5000; el('sip_rate').value = 12; el('sip_years').value = 10;
+
+    // Optional: Run initial calc to show example
+    // calcLumpsum(); calcSIP();
+  </script>
+</body>
 </html>
