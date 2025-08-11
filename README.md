@@ -1,4 +1,4 @@
-# Lampsum-Calculator-
+# Lampsum-Calculator--
 <!doctype html>
 
 <html lang="en">
